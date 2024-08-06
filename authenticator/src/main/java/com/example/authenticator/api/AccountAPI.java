@@ -2,6 +2,7 @@ package com.example.authenticator.api;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.RestTemplate;
@@ -31,16 +32,21 @@ public class AccountAPI {
 	}
 	
 	@PostMapping("/register")
-	public ResponseEntity<?> newAccount(@PathVariable("account") Customer newCustomer) {
+	public ResponseEntity<?> newAccount(@PathVariable("customer") Customer newCustomer) {
 		// push new customer to customer api
 		String uri = "https://localhost:8080/api/customers/";
 		RestTemplate restTemplate = new RestTemplate();
-		HttpEntity<Customer> request = new HttpEntity<>(newCustomer);
-		Customer result = restTemplate.postForObject(uri, request, Customer.class);
+		//add header with a token 
+		HttpHeaders headers = new HttpHeaders();
+		headers.add("Authorization", createToken("ApiClientApp").getToken());
+		HttpEntity<Customer> request = new HttpEntity<>(newCustomer, headers);
+		ResponseEntity<Customer> result = restTemplate.postForEntity(uri, request, Customer.class);
 		
-		return ResponseEntity.ok().build();
+		return result;
 	}
 	
+	
+	// Not api end points, helper methods
 	public static boolean checkPassword(String user, String password) {
 		// make api call to Customer api 
 		String uri = "https://localhost:8080/api/customers/byname/" + user;
