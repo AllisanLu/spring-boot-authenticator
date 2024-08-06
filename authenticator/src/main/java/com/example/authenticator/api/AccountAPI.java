@@ -1,12 +1,10 @@
 package com.example.authenticator.api;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.RestTemplate;
-import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import com.example.authenticator.data.Customer;
 import com.example.authenticator.data.JWTHelper;
@@ -21,8 +19,13 @@ public class AccountAPI {
 	
 	private static Token appUserToken;
 	
+	@GetMapping("/token")
+	public String getAll() {
+		return "jwt-fake-token-asdfasdfasfa".toString();
+	}
+	
 	@PostMapping("/token")
-	public Optional<Token> newToken(@PathVariable("account") Customer customer) {		
+	public Optional<Token> newToken(@RequestBody Customer customer) {		
 		//check if customer is there
 		if (checkPassword(customer.getName(), customer.getPassword())) { 
 				// generate token
@@ -32,7 +35,7 @@ public class AccountAPI {
 	}
 	
 	@PostMapping("/register")
-	public ResponseEntity<?> newAccount(@PathVariable("customer") Customer newCustomer) {
+	public ResponseEntity<?> newAccount(@RequestBody Customer newCustomer) {
 		// push new customer to customer api
 		String uri = "https://localhost:8080/api/customers/";
 		RestTemplate restTemplate = new RestTemplate();
