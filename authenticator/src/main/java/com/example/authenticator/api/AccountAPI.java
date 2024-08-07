@@ -2,6 +2,7 @@ package com.example.authenticator.api;
 
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.RestTemplate;
@@ -37,26 +38,35 @@ public class AccountAPI {
 	@PostMapping("/register")
 	public ResponseEntity<?> newAccount(@RequestBody Customer newCustomer) {
 		// push new customer to customer api
-		String uri = "https://localhost:8080/api/customers/";
+		String uri = "http://localhost:8080/api/customers";
 		RestTemplate restTemplate = new RestTemplate();
+		
 		//add header with a token 
 		HttpHeaders headers = new HttpHeaders();
+		String token = createToken("ApiClientApp").getToken();
 		headers.add("Authorization", createToken("ApiClientApp").getToken());
+		
 		HttpEntity<Customer> request = new HttpEntity<>(newCustomer, headers);
-		ResponseEntity<Customer> result = restTemplate.postForEntity(uri, request, Customer.class);
+		ResponseEntity<Customer> result = restTemplate.exchange(uri, HttpMethod.POST, request, Customer.class);
 		
 		return result;
-	}
-	
+	}	
 	
 	// Not api end points, helper methods
 	public static boolean checkPassword(String user, String password) {
 		// make api call to Customer api 
-		String uri = "https://localhost:8080/api/customers/byname/" + user;
-		RestTemplate restTemplate = new RestTemplate();
-		Customer result = restTemplate.getForObject(uri,  Customer.class);
 		
-		if (result != null && result.getPassword().equals(password)) {
+		String uri = "http://localhost:8080/api/customers/byname/" + user;
+		
+		HttpHeaders headers = new HttpHeaders();
+		String token = createToken("ApiClientApp").getToken();
+		headers.add("Authorization", createToken("ApiClientApp").getToken());
+		
+		RestTemplate restTemplate = new RestTemplate();
+		HttpEntity<Void> request = new HttpEntity<>(headers);
+		ResponseEntity<Customer> result = restTemplate.exchange(uri, HttpMethod.GET, request, Customer.class);
+		
+		if (result.getBody() != null && result.getBody().getPassword().equals(password)) {
 			return true;
 		}
 		return false;
