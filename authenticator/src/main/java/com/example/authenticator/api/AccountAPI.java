@@ -43,8 +43,8 @@ public class AccountAPI {
 		
 		//add header with a token 
 		HttpHeaders headers = new HttpHeaders();
-		String token = createToken("ApiClientApp").getToken();
-		headers.add("Authorization", createToken("ApiClientApp").getToken());
+		String token = getAppUserToken().getToken();
+		headers.add("Authorization", "Bearer " + token);
 		
 		HttpEntity<Customer> request = new HttpEntity<>(newCustomer, headers);
 		ResponseEntity<Customer> result = restTemplate.exchange(uri, HttpMethod.POST, request, Customer.class);
@@ -59,8 +59,8 @@ public class AccountAPI {
 		String uri = "http://localhost:8080/api/customers/byname/" + user;
 		
 		HttpHeaders headers = new HttpHeaders();
-		String token = createToken("ApiClientApp").getToken();
-		headers.add("Authorization", createToken("ApiClientApp").getToken());
+		Token token = getAppUserToken();
+		headers.add("Authorization", "Bearer " + token.getToken());
 		
 		RestTemplate restTemplate = new RestTemplate();
 		HttpEntity<Void> request = new HttpEntity<>(headers);
