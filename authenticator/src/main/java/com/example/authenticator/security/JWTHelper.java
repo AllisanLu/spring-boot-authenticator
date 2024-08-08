@@ -1,4 +1,4 @@
-package com.example.authenticator.data;
+package com.example.authenticator.security;
 
 import java.util.Date;
 import java.util.Map;

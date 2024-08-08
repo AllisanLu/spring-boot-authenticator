@@ -3,16 +3,14 @@ package com.example.authenticator.api;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.RestTemplate;
 
 import com.example.authenticator.data.Customer;
-import com.example.authenticator.data.JWTHelper;
 import com.example.authenticator.data.Token;
-
-import java.net.URI;
-import java.util.Optional;
+import com.example.authenticator.security.JWTHelper;
 
 @RestController
 @RequestMapping("/account")
@@ -26,13 +24,14 @@ public class AccountAPI {
 	}
 	
 	@PostMapping("/token")
-	public Optional<Token> newToken(@RequestBody Customer customer) {		
+	public ResponseEntity<?> newToken(@RequestBody Customer customer) {		
 		//check if customer is there
 		if (checkPassword(customer.getName(), customer.getPassword())) { 
 				// generate token
-			return Optional.of(createToken(customer.getName()));
+			return ResponseEntity.ok(createToken(customer.getName()));
 		}
-		return Optional.empty();
+		
+		return new ResponseEntity<>("Incorrect Username or Password", HttpStatus.UNAUTHORIZED);
 	}
 	
 	@PostMapping("/register")
